@@ -925,10 +925,12 @@ protected:
     typedef allocator_traits<allocator_type>         __alloc_traits;
     typedef value_type&                              reference;
     typedef const value_type&                        const_reference;
-    typedef typename __alloc_traits::size_type       size_type;
-    typedef typename __alloc_traits::difference_type difference_type;
     typedef typename __alloc_traits::pointer         pointer;
     typedef typename __alloc_traits::const_pointer   const_pointer;
+    typedef typename __alloc_traits::size_type       raw_size_type;
+    typedef typename __rebind_persistency_type<pointer, raw_size_type>::type size_type;
+    typedef typename __alloc_traits::difference_type raw_difference_type;
+    typedef typename __rebind_persistency_type<pointer, raw_difference_type>::type difference_type;
 
     static const difference_type __block_size;
 

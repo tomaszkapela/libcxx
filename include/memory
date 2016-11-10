@@ -814,6 +814,29 @@ struct __pointer_traits_difference_type<_Ptr, true>
     typedef typename _Ptr::difference_type type;
 };
 
+template <class _Ptr>
+struct __has_persistency_type
+{
+private:
+    struct __two {char __lx; char __lxx;};
+    template <class _Up> static __two __test(...);
+    template <class _Up> static char __test(typename _Up::persistency_type* = 0);
+public:
+    static const bool value = sizeof(__test<_Ptr>(0)) == 1;
+};
+
+template <class _Tp, class _Ptr, bool = __has_persistency_type<_Ptr>::value>
+struct __pointer_traits_persistency_type
+{
+    typedef _Tp type;
+};
+
+template <class _Tp, class _Ptr>
+struct __pointer_traits_persistency_type<_Tp, _Ptr, true>
+{
+    typedef typename _Ptr::persistency_type type;
+};
+
 template <class _Tp, class _Up>
 struct __has_rebind
 {
@@ -931,6 +954,7 @@ struct _LIBCPP_TEMPLATE_VIS pointer_traits
     typedef _Ptr                                                     pointer;
     typedef typename __pointer_traits_element_type<pointer>::type    element_type;
     typedef typename __pointer_traits_difference_type<pointer>::type difference_type;
+    typedef typename __pointer_traits_persistency_type<element_type, pointer>::type persistency_type;
 
 #ifndef _LIBCPP_CXX03_LANG
     template <class _Up> using rebind = typename __pointer_traits_rebind<pointer, _Up>::type;
@@ -954,6 +978,7 @@ struct _LIBCPP_TEMPLATE_VIS pointer_traits<_Tp*>
     typedef _Tp*      pointer;
     typedef _Tp       element_type;
     typedef ptrdiff_t difference_type;
+    typedef _Tp       persistency_type;
 
 #ifndef _LIBCPP_CXX03_LANG
     template <class _Up> using rebind = _Up*;
@@ -977,6 +1002,11 @@ struct __rebind_pointer {
 #else
     typedef typename pointer_traits<_From>::template rebind<_To>::other type;
 #endif
+};
+
+template<class _Ptr, class _Tp>
+struct __rebind_persistency_type {
+    typedef typename pointer_traits<typename __rebind_pointer<_Ptr, _Tp>::type>::persistency_type type;
 };
 
 // allocator_traits
@@ -1844,6 +1874,7 @@ class _LIBCPP_TEMPLATE_VIS allocator<const _Tp>
 public:
     typedef size_t            size_type;
     typedef ptrdiff_t         difference_type;
+    typedef const _Tp         persistency_type;
     typedef const _Tp*        pointer;
     typedef const _Tp*        const_pointer;
     typedef const _Tp&        reference;

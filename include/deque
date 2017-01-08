@@ -929,18 +929,19 @@ protected:
     typedef allocator_traits<allocator_type>         __alloc_traits;
     typedef value_type&                              reference;
     typedef const value_type&                        const_reference;
-    typedef typename __alloc_traits::size_type       size_type;
-    typedef typename __alloc_traits::difference_type difference_type;
     typedef typename __alloc_traits::pointer         pointer;
     typedef typename __alloc_traits::const_pointer   const_pointer;
+    typedef typename __alloc_traits::size_type       raw_size_type;
+    typedef typename __rebind_persistency_type<pointer, raw_size_type>::type size_type;
+    typedef typename __alloc_traits::difference_type raw_difference_type;
+    typedef typename __rebind_persistency_type<pointer, raw_difference_type>::type difference_type;
 
     static const difference_type __block_size;
 
     typedef typename __rebind_alloc_helper<__alloc_traits, pointer>::type __pointer_allocator;
     typedef allocator_traits<__pointer_allocator>        __map_traits;
     typedef typename __map_traits::pointer               __map_pointer;
-    typedef typename __rebind_alloc_helper<__alloc_traits, const_pointer>::type __const_pointer_allocator;
-    typedef typename allocator_traits<__const_pointer_allocator>::const_pointer __map_const_pointer;
+    typedef typename allocator_traits<__pointer_allocator>::const_pointer __map_const_pointer;
     typedef __split_buffer<pointer, __pointer_allocator> __map;
 
     typedef __deque_iterator<value_type, pointer, reference, __map_pointer,
